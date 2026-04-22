@@ -30,17 +30,6 @@ const USE_CASES = [
   { icon: "💼", who: "Tu gères une équipe", what: "Partage-le en réunion pour que tout le monde parte dans la même direction." },
 ];
 
-// ── Sections du brief ─────────────────────────────────────────────────────────
-const BRIEF_SECTIONS = [
-  "CONTEXTE & VISION",
-  "OBJECTIFS CRÉATIFS",
-  "PUBLIC CIBLE",
-  "DIRECTION ARTISTIQUE",
-  "LIVRABLES ATTENDUS",
-  "CONTRAINTES",
-  "CRITÈRES DE SUCCÈS",
-];
-
 // ── Chip ──────────────────────────────────────────────────────────────────────
 function Chip({ label, icon, selected, onClick }) {
   return (
