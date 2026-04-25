@@ -522,6 +522,102 @@ function generateLocalBrief(form) {
   ];
 }
 
+// ── Review Page ──────────────────────────────────────────────────────────────
+function ReviewPage({ onBack }) {
+  const [rform, setRform] = useState({ nom: "", role: "", stars: 5, message: "" });
+  const [status, setStatus] = useState("idle");
+
+  const setR = (k, v) => setRform(f => ({ ...f, [k]: v }));
+
+  const send = async () => {
+    if (!rform.nom || !rform.message) { setStatus("error"); return; }
+    setStatus("sending");
+    try {
+      const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          service_id: EMAILJS_SERVICE_ID,
+          template_id: EMAILJS_TEMPLATE_ID,
+          user_id: EMAILJS_PUBLIC_KEY,
+          template_params: {
+            nom: rform.nom,
+            prenom: "—",
+            email: "Avis utilisateur",
+            societe: rform.role || "Non renseigné",
+            produit: `⭐ ${rform.stars}/5 étoiles`,
+            message: rform.message,
+          },
+        }),
+      });
+      if (res.ok) setStatus("success");
+      else setStatus("error");
+    } catch { setStatus("error"); }
+  };
+
+  if (status === "success") return (
+    <div style={{ paddingTop: "3rem", textAlign: "center", animation: "fadeUp 0.4s ease" }}>
+      <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🎉</div>
+      <h2 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.5rem", color: "#111", marginBottom: "0.5rem" }}>Merci pour ton avis !</h2>
+      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.85rem", color: "#777", lineHeight: 1.6, marginBottom: "2rem" }}>
+        Ton avis sera publié sur la page d'accueil après validation.
+      </p>
+      <button onClick={onBack} style={{ background: "#2D6EF5", color: "#fff", border: "none", padding: "1rem 2rem", borderRadius: "12px", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "0.9rem", cursor: "pointer" }}>
+        Retour à l'accueil
+      </button>
+    </div>
+  );
+
+  return (
+    <div style={{ paddingTop: "1.5rem", animation: "fadeUp 0.3s ease" }}>
+      <button onClick={onBack} style={{ background: "none", border: "none", fontFamily: "'DM Sans', sans-serif", fontSize: "0.82rem", color: "#2D6EF5", cursor: "pointer", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.3rem" }}>← Retour</button>
+
+      <h1 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.8rem", color: "#111", marginBottom: "0.4rem" }}>Laisser un avis</h1>
+      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.83rem", color: "#777", lineHeight: 1.6, marginBottom: "2rem" }}>
+        Tu as utilisé BriefGen ? Partage ton expérience — ça aide les autres utilisateurs.
+      </p>
+
+      <div style={{ marginBottom: "0.7rem" }}>
+        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.72rem", color: "#aaa", marginBottom: "0.3rem" }}>Ton prénom / pseudo *</div>
+        <input className="field" placeholder="Marie D." value={rform.nom} onChange={e => setR("nom", e.target.value)} />
+      </div>
+
+      <div style={{ marginBottom: "0.7rem" }}>
+        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.72rem", color: "#aaa", marginBottom: "0.3rem" }}>Ton rôle (optionnel)</div>
+        <input className="field" placeholder="ex: Directrice artistique, Freelance, Entrepreneur..." value={rform.role} onChange={e => setR("role", e.target.value)} />
+      </div>
+
+      <div style={{ marginBottom: "0.7rem" }}>
+        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.72rem", color: "#aaa", marginBottom: "0.5rem" }}>Note *</div>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          {[1,2,3,4,5].map(s => (
+            <button key={s} onClick={() => setR("stars", s)} style={{ fontSize: "1.6rem", background: "none", border: "none", cursor: "pointer", opacity: s <= rform.stars ? 1 : 0.25, transition: "opacity 0.15s" }}>★</button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: "1.2rem" }}>
+        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.72rem", color: "#aaa", marginBottom: "0.3rem" }}>Ton avis *</div>
+        <textarea className="field" rows={5} placeholder="Qu'est-ce que tu as aimé ? Comment BriefGen t'a aidé ?" value={rform.message} onChange={e => setR("message", e.target.value)} />
+      </div>
+
+      {status === "error" && (
+        <div style={{ background: "#FEF2F2", border: "1.5px solid #FECACA", borderRadius: "12px", padding: "0.8rem 1rem", fontFamily: "'DM Sans', sans-serif", fontSize: "0.8rem", color: "#DC2626", marginBottom: "1rem" }}>
+          ⚠ Remplis les champs obligatoires et réessaie.
+        </div>
+      )}
+
+      <button onClick={send} disabled={status === "sending"} style={{ width: "100%", background: status === "sending" ? "#93B4FA" : "#2D6EF5", color: "#fff", border: "none", padding: "1.15rem", borderRadius: "16px", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1rem", cursor: status === "sending" ? "not-allowed" : "pointer", boxShadow: "0 8px 24px rgba(45,110,245,0.25)" }}>
+        {status === "sending" ? "Envoi en cours..." : "ENVOYER MON AVIS →"}
+      </button>
+
+      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.7rem", color: "#bbb", textAlign: "center", marginTop: "0.8rem" }}>
+        Ton avis sera publié après validation de notre équipe.
+      </p>
+    </div>
+  );
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function BriefGen() {
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -571,6 +667,17 @@ export default function BriefGen() {
         <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; } @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }`}</style>
         <div style={{ maxWidth: "560px", margin: "0 auto", padding: "0 1.2rem 4rem" }}>
           <LegalPage type={screen} onBack={() => setScreen("home")} />
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === "review") {
+    return (
+      <div style={{ minHeight: "100vh", background: "#F4F5F7" }}>
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; } .field { width: 100%; background: #fff; border: 1.5px solid #E8E8E8; color: #111; padding: 0.85rem 1rem; font-family: "DM Sans", sans-serif; font-size: 0.85rem; border-radius: 12px; outline: none; resize: none; transition: border-color 0.18s; } .field:focus { border-color: #2D6EF5; } .field::placeholder { color: #bbb; } @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+        <div style={{ maxWidth: "560px", margin: "0 auto", padding: "0 1.2rem 4rem" }}>
+          <ReviewPage onBack={() => setScreen("home")} />
         </div>
       </div>
     );
@@ -673,7 +780,12 @@ export default function BriefGen() {
 
             {/* Reviews */}
             <div style={{ marginBottom: "2rem" }}>
-              <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.7rem", color: "#bbb", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "0.7rem" }}>Ce qu'ils en disent</div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.7rem" }}>
+                <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.7rem", color: "#bbb", letterSpacing: "0.08em", textTransform: "uppercase" }}>Ce qu'ils en disent</div>
+                <button onClick={() => setScreen("review")} style={{ background: "#EEF3FF", border: "1.5px solid #C7D9FF", borderRadius: "20px", padding: "0.3rem 0.8rem", fontFamily: "'DM Sans', sans-serif", fontSize: "0.7rem", fontWeight: 500, color: "#2D6EF5", cursor: "pointer" }}>
+                  + Laisser un avis
+                </button>
+              </div>
               {REVIEWS.map(({ name, role, text, stars }) => (
                 <div key={name} className="card" style={{ border: "1.5px solid #E8E8E8", marginBottom: "0.6rem" }}>
                   <div style={{ color: "#F59E0B", fontSize: "0.8rem", marginBottom: "0.5rem" }}>{"★".repeat(stars)}</div>
