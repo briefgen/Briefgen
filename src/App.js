@@ -4,7 +4,7 @@ const STORAGE_KEY = "briefgen_subscribed_v5";
 const PAYPAL_PLAN_ID = "P-0L485261T33273038NHWKF6Y";
 const PAYPAL_CLIENT_ID = "ATLqqstarq-l-QBFlBsTpllSUKw48UA4_Y09qO7Nvwh5wioh9zIRIzfrctBJiUfhiHvCqsgWGkgCHjYA";
 const CONTACT_EMAIL = "digitaldaydreams77@gmail.com";
-const ANTHROPIC_API_KEY = "REMPLACE_PAR_TA_CLE_API_ANTHROPIC";
+const GEMINI_API_KEY = "AIzaSyCLoTmYeZD2CuxTk-hmVnS8Plille2qmwU"; // Colle ta clé ici
 
 const projectTypes = [
   { label: "Logo & identité", icon: "◈" },
@@ -480,13 +480,13 @@ Génère exactement 7 sections avec ce format JSON :
 Réponds UNIQUEMENT avec le JSON valide, sans texte avant ou après. Écris en français.`;
 
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, messages: [{ role: "user", content: prompt }] }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
     });
     const data = await res.json();
-    const text = data.content?.[0]?.text || "";
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     const clean = text.replace(/```json|```/g, "").trim();
     const parsed = JSON.parse(clean);
     if (parsed.sections?.length === 7) return parsed.sections;
