@@ -4,7 +4,7 @@ const STORAGE_KEY = "briefgen_subscribed_v5";
 const PAYPAL_PLAN_ID = "P-0L485261T33273038NHWKF6Y";
 const PAYPAL_CLIENT_ID = "ATLqqstarq-l-QBFlBsTpllSUKw48UA4_Y09qO7Nvwh5wioh9zIRIzfrctBJiUfhiHvCqsgWGkgCHjYA";
 const CONTACT_EMAIL = "digitaldaydreams77@gmail.com";
-const GEMINI_API_KEY = "AIzaSyCLoTmYeZD2CuxTk-hmVnS8Plille2qmwU"; // Colle ta clé ici
+const GEMINI_API_KEY = "AIzaSyCLoTmYeZD2CuxTk-hmVnS8Plille2qmwU";
 
 const projectTypes = [
   { label: "Logo & identité", icon: "◈" },
